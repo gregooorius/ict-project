@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   ButtonGroup,
   Card,
@@ -8,11 +7,11 @@ import {
   Center,
   Divider,
   Heading,
-  SimpleGrid,
   Image,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { Link } from "react-router-dom";
 import { ArtworkBase } from "../Models/Artwork";
 
 export function ListItem({
@@ -46,9 +45,12 @@ export function ListItem({
       <Divider />
       <CardFooter justifyContent={"center"}>
         <ButtonGroup spacing="2">
-          <Button variant="solid" colorScheme="orange">
-            Details
-          </Button>
+          <Link to={"artwork/" + item.id} state={{imageApi: imageApi}}>
+            <Button variant="solid" colorScheme="orange">
+              Details
+            </Button>
+          </Link>
+
           <Button
             onClick={setFav}
             leftIcon={favorite ? <AiFillStar /> : <AiOutlineStar />}

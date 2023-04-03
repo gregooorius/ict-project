@@ -12,3 +12,14 @@ export type Thumbnail = {
     height: number,
     alt_text: string
 }
+
+export type ArtworkDetails = {
+  id: number;
+  artist_display: string;
+  classification_title: string;
+  date_display: string;
+  exhibition_history: string;
+  image_id: string;
+  provenance_text: string;
+  title: string;
+};
