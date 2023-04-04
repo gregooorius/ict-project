@@ -2,23 +2,40 @@ import { SimpleGrid, Center, Button, Box, Input } from "@chakra-ui/react";
 import { ArtworkBase } from "../Models/Artwork";
 import { useEffect, useState } from "react";
 import { ListItem } from "../Components/ListItem";
-import { BaseDataAction } from "../Services/BaseDataService";
 import { SearchAction } from "../Services/SearchService";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
+import { add, search, setImageApi } from "../store/Artworks/artworksSlice";
 
 export function Home() {
-  const [data, setData] = useState<ArtworkBase[]>();
-  const [imageApi, setImageApi] = useState("");
+  const artwork = useSelector((state: RootState) => state.artwork);
+  const searchTerm = useSelector(
+    (state: RootState) => state.artwork.searchTerm
+  );
+  const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [searchTermInput, setSearch] = useState(searchTerm);
   const handleChange = (event: any) => setSearch(event.target.value);
 
   useEffect(() => {
-    SearchAction.search(page, search).then((response) => {
-      setData(response.data.data);
-      setImageApi(response.data.config.iiif_url);
-      console.log(response.data);
-    });
-  }, [page]);
+    let isActive = true;
+    const controller = new AbortController();
+    if (!artwork.pages.some((p) => p.pageNumber === page)) {
+      SearchAction.search(page, artwork.searchTerm, controller).then(
+        (response) => {
+          if (isActive) {
+            dispatch(add({ pageNumber: page, artworks: response.data.data }));
+            dispatch(setImageApi({ imageApi: response.data.config.iiif_url }));
+            console.log(response.data);
+          }
+        }
+      );
+    }
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, [page, searchTerm]);
 
   function handleNextPage() {
     setPage(page + 1);
@@ -28,11 +45,8 @@ export function Home() {
   }
 
   const handleSearch = async () => {
-    await SearchAction.search(1, search)
-    .then((response) => {
-        setData(response.data.data)
-        console.log(response.data);
-    });
+    dispatch(search({ searchTerm: searchTermInput }));
+    setPage(1);
   };
 
   return (
@@ -43,7 +57,7 @@ export function Home() {
           variant="filled"
           colorScheme="orange"
           w={"40%"}
-          value={search}
+          value={searchTermInput}
           onChange={handleChange}
         />
         <Button onClick={handleSearch} colorScheme={"orange"}>
@@ -51,9 +65,13 @@ export function Home() {
         </Button>
       </Center>
       <SimpleGrid columns={3} spacing={2}>
-        {data?.map((item) => {
-          return <ListItem item={item} imageApi={imageApi} key={item.id} />;
-        })}
+        {artwork.pages
+          .find((p) => p.pageNumber === page)
+          ?.artworks.map((item) => {
+            return (
+              <ListItem item={item} imageApi={artwork.imageApi} key={item.id} />
+            );
+          })}
       </SimpleGrid>
       <Center gap={5}>
         <Button

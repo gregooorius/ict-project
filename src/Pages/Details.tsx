@@ -17,18 +17,24 @@ import {
 import { useEffect, useState } from "react";
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { MdLocalShipping } from "react-icons/md";
-import { useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { ArtworkDetails } from "../Models/Artwork";
 import { DetailsAction } from "../Services/DetailsService";
+import { RootState } from "../store";
+
+import { setImageApi } from "../store/Artworks/artworksSlice";
 
 export function Details() {
   const { id } = useParams();
-  const {state} = useLocation()
   const [details, setDetails] = useState<ArtworkDetails>();
+  const imageApi = useSelector((state:RootState) => state.artwork.imageApi)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     DetailsAction.getDetails(Number(id))
       .then((response) => {
+        dispatch(setImageApi({imageApi: response.data.config.iiif_url}))
         setDetails(response.data.data);
         console.log(response.data);
       })
@@ -49,7 +55,7 @@ export function Details() {
             rounded={"md"}
             alt={"product image"}
             src={
-              (state.imageApi + "/" + details?.image_id + "/full/843,/0/default.jpg")
+              (imageApi + "/" + details?.image_id + "/full/843,/0/default.jpg")
             }
             fit={"cover"}
             align={"center"}

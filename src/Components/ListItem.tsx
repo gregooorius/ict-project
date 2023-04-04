@@ -9,10 +9,12 @@ import {
   Heading,
   Image,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ArtworkBase } from "../Models/Artwork";
+import { RootState } from "../store";
+import { add, remove } from "../store/Favorites/favoritesSlice";
 
 export function ListItem({
   item,
@@ -21,10 +23,16 @@ export function ListItem({
   item: ArtworkBase;
   imageApi: string;
 }) {
-  const [favorite, setFavorite] = useState(false);
+  const favorites = useSelector(
+    (state: RootState) => state.favorite.artworkIds
+  );
+
+  const isFavorite = favorites.includes(item.id);
+
+  const dispatch = useDispatch();
 
   function setFav() {
-    setFavorite(!favorite);
+    isFavorite ? dispatch(remove(item.id)) : dispatch(add(item.id));
   }
   return (
     <Card key={item.id} margin={5} borderColor={"orange"} border={"1px"}>
@@ -45,7 +53,7 @@ export function ListItem({
       <Divider />
       <CardFooter justifyContent={"center"}>
         <ButtonGroup spacing="2">
-          <Link to={"artwork/" + item.id} state={{imageApi: imageApi}}>
+          <Link to={"/artwork/" + item.id} state={{ imageApi: imageApi }}>
             <Button variant="solid" colorScheme="orange">
               Details
             </Button>
@@ -53,11 +61,11 @@ export function ListItem({
 
           <Button
             onClick={setFav}
-            leftIcon={favorite ? <AiFillStar /> : <AiOutlineStar />}
+            leftIcon={isFavorite ? <AiFillStar /> : <AiOutlineStar />}
             variant="solid"
             colorScheme="orange"
           >
-            Add to favorites
+            {isFavorite ? "Remove from favorites" : "Add to favorites"}
           </Button>
         </ButtonGroup>
       </CardFooter>

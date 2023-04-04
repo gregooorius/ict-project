@@ -5,6 +5,10 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Details } from "./Pages/Details";
 import { Home } from "./Pages/Home";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { Favorites } from "./Pages/Favorites";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +20,7 @@ const router = createBrowserRouter([
       },
       {
         path: "favorites/",
-        element: <div>Hello favorites</div>,
+        element: <Favorites/>,
       },
       {
         path: "artwork/:id",
@@ -28,8 +32,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ChakraProvider>
-      <RouterProvider router={router} />
-    </ChakraProvider>
+    <Provider store={store}>
+      <ChakraProvider>
+        <RouterProvider router={router} />
+      </ChakraProvider>
+    </Provider>
   </React.StrictMode>
 );
