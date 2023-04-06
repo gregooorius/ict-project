@@ -22,4 +22,8 @@ export type ArtworkDetails = {
   image_id: string;
   provenance_text: string;
   title: string;
+  gallery_title: string;
+  place_of_origin: string;
+  dimensions: string;
+  department_title: string;
 };
