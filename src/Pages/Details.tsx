@@ -184,7 +184,7 @@ export function Details() {
               boxShadow: "lg",
             }}
           >
-            Add to favorites
+            {isFavorite ? "Remove from favorites" : "Add to favorites"}
           </Button>
         </Stack>
       </SimpleGrid>
